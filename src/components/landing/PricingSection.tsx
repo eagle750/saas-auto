@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 async function startRazorpayCheckout(userEmail: string, userName: string, onSuccess: () => void) {
   const res = await fetch("/api/razorpay/create-subscription", { method: "POST" });
@@ -46,30 +47,43 @@ async function startRazorpayCheckout(userEmail: string, userName: string, onSucc
   rzp.open();
 }
 
+function loadRazorpayScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if ((window as any).Razorpay) return resolve();
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Failed to load Razorpay"));
+    document.body.appendChild(script);
+  });
+}
+
 export function PricingSection() {
   const { data: session } = useSession();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  // Pre-load Razorpay script so first click is instant
+  useEffect(() => {
+    loadRazorpayScript().catch(() => {});
+  }, []);
 
   const handleProIndia = async () => {
     if (!session?.user) {
       router.push("/login");
       return;
     }
-    // Load Razorpay script if not already loaded
-    if (!(window as any).Razorpay) {
-      await new Promise<void>((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error("Failed to load Razorpay"));
-        document.body.appendChild(script);
-      });
+    setLoading(true);
+    try {
+      await loadRazorpayScript();
+      await startRazorpayCheckout(
+        session.user.email ?? "",
+        session.user.name ?? "",
+        () => router.push("/dashboard?upgraded=1")
+      );
+    } finally {
+      setLoading(false);
     }
-    await startRazorpayCheckout(
-      session.user.email ?? "",
-      session.user.name ?? "",
-      () => router.push("/dashboard?upgraded=1")
-    );
   };
 
   return (
@@ -117,7 +131,9 @@ export function PricingSection() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full" onClick={handleProIndia}>Subscribe</Button>
+              <Button className="w-full" onClick={handleProIndia} disabled={loading}>
+                {loading ? "Loading..." : "Subscribe"}
+              </Button>
             </CardContent>
           </Card>
         </div>
