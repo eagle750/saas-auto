@@ -32,7 +32,7 @@ export default async function CompanyResumePage({ params }: Props) {
   if (!comp) notFound();
 
   return (
-    <div className="container max-w-3xl py-12">
+    <div className="container max-w-3xl py-12 px-4">
       <h1 className="text-3xl font-bold mb-4">
         How to Tailor Your Resume for {comp.name}
       </h1>
