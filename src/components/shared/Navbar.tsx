@@ -10,7 +10,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-      <div className="container mx-auto px-4 flex h-14 items-center justify-between">
+      <div className="container mx-auto px-4 max-w-5xl flex h-14 items-center justify-between">
         <Link href="/" className="font-semibold text-lg">
           ResumeAI
         </Link>
