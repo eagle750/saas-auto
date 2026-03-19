@@ -25,13 +25,15 @@ export async function POST(req: NextRequest) {
 
     // Extract text
     if (file.name.endsWith(".pdf")) {
-      // DOMMatrix polyfill required by pdfjs-dist in Node.js environment
+      // pdfjs-dist (used by pdf-parse) requires DOMMatrix which is browser-only.
+      // Polyfill before dynamic import so it's set before module evaluation.
       if (typeof globalThis.DOMMatrix === "undefined") {
-        // @ts-expect-error polyfill for server environment
+        // @ts-expect-error polyfill for Node.js server environment
         globalThis.DOMMatrix = class DOMMatrix {};
       }
-      const pdfParse = (await import("pdf-parse")).default;
-      const result = await pdfParse(buffer);
+      const { PDFParse } = await import("pdf-parse");
+      const parser = new PDFParse({ data: buffer });
+      const result = await parser.getText();
       text = result.text ?? "";
     } else if (file.name.endsWith(".docx") || file.name.endsWith(".doc")) {
       const result = await mammoth.extractRawText({ buffer });
