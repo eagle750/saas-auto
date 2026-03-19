@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Upload, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -17,6 +17,7 @@ export function ResumeUploader({
 }: ResumeUploaderProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -97,21 +98,24 @@ export function ResumeUploader({
       className="rounded-lg border-2 border-dashed p-8 text-center"
     >
       <input
+        ref={inputRef}
         type="file"
         accept=".pdf,.docx,.doc"
         onChange={onInputChange}
         className="hidden"
-        id="resume-upload"
       />
       <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
       <p className="text-sm text-muted-foreground mb-2">
         Drag & drop your resume (PDF or DOCX) or click to upload
       </p>
-      <label htmlFor="resume-upload">
-        <Button type="button" variant="outline" disabled={loading}>
-          {loading ? "Parsing…" : "Choose file"}
-        </Button>
-      </label>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={loading}
+        onClick={() => inputRef.current?.click()}
+      >
+        {loading ? "Parsing…" : "Choose file"}
+      </Button>
       {error && <p className="text-sm text-destructive mt-2">{error}</p>}
     </div>
   );
