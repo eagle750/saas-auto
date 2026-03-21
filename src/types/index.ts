@@ -1,3 +1,6 @@
+export * from "./project";
+export * from "./ai";
+
 export interface TailoredResume {
   summary: string;
   experience: Array<{

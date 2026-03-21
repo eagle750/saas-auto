@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { DM_Sans, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/shared/Navbar";
-import { Footer } from "@/components/shared/Footer";
-import { WebsiteJsonLd } from "@/components/seo/JsonLd";
+import { Navbar } from "@/components/layout/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 
-const geistSans = DM_Sans({
+const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
@@ -18,39 +16,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://resumeai.in";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ai-auto-saas.dev";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "ResumeAI — AI Resume Tailor | ATS Optimization in 30 Seconds",
-    template: "%s | ResumeAI",
+    default: "AI-Auto-SaaS — Build SaaS with AI",
+    template: "%s | AI-Auto-SaaS",
   },
   description:
-    "Paste a job description and get an ATS-optimized tailored resume in 30 seconds. Free AI resume tailor trusted by 10,000+ job seekers in India.",
+    "Describe your SaaS idea and let AI build, configure, and deploy it for you. From concept to GitHub push in minutes.",
   keywords: [
-    "AI resume tailor",
-    "ATS resume optimizer",
-    "tailor resume to job description",
-    "resume keyword optimizer",
-    "ATS score checker",
-    "AI resume builder India",
-    "resume tailor free",
-    "job description resume matcher",
+    "AI SaaS builder",
+    "automated SaaS generation",
+    "AI code generation",
+    "SaaS platform",
+    "no-code SaaS builder",
+    "AI-powered deployment",
   ],
   openGraph: {
     type: "website",
-    locale: "en_IN",
+    locale: "en_US",
     url: baseUrl,
-    siteName: "ResumeAI",
-    title: "ResumeAI — AI Resume Tailor | ATS Optimization in 30 Seconds",
-    description: "Paste a job description, get a perfectly tailored resume. Free.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "ResumeAI" }],
+    siteName: "AI-Auto-SaaS",
+    title: "AI-Auto-SaaS — Build SaaS with AI",
+    description:
+      "Describe your SaaS idea. We build, configure, and deploy it automatically.",
+    images: [
+      { url: "/og-image.png", width: 1200, height: 630, alt: "AI-Auto-SaaS" },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ResumeAI — Tailor Your Resume with AI",
-    description: "Paste a job description, get a perfectly tailored resume. Free.",
+    title: "AI-Auto-SaaS — Build SaaS with AI",
+    description: "Describe your SaaS idea. We build it.",
     images: ["/og-image.png"],
   },
   robots: { index: true, follow: true },
@@ -63,14 +62,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col antialiased`}>
+    <html lang="en" suppressHydrationWarning className="dark">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col antialiased bg-[#0A0F1C] text-[#F8FAFC]`}
+      >
         <SessionProvider>
-          <ThemeProvider attribute="class" defaultTheme="light">
-            <WebsiteJsonLd />
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
             <Navbar />
             <main className="flex-1">{children}</main>
-            <Footer />
             <Toaster />
           </ThemeProvider>
         </SessionProvider>
