@@ -1,8 +1,18 @@
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  typescript: true,
-});
+function createStripeClient(): Stripe {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return new Proxy({} as Stripe, {
+      get(_, prop) {
+        if (typeof prop === "symbol" || prop === "then") return undefined;
+        throw new Error(`STRIPE_SECRET_KEY is not set. Cannot access stripe.${String(prop)}`);
+      },
+    });
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, { typescript: true });
+}
+
+export const stripe = createStripeClient();
 
 export const PLAN_PRICE_IDS: Record<string, string> = {
   STARTER: process.env.STRIPE_STARTER_PRICE_ID ?? "",
