@@ -44,7 +44,7 @@ export default function HomePage() {
 
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-sm font-medium text-violet-400 tracking-widest uppercase mb-4 block">
+            <span className="text-sm font-medium text-emerald-400 tracking-widest uppercase mb-4 block">
               Pricing
             </span>
             <h2

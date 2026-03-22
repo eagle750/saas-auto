@@ -11,7 +11,7 @@ const testimonials = [
       "I shipped a complete SaaS idea in under an hour. The code quality actually surprised me — proper TypeScript, error handling, everything.",
     rating: 5,
     avatar: "SK",
-    gradient: "from-blue-500 to-violet-600",
+    gradient: "from-emerald-500 to-teal-500",
   },
   {
     name: "Marcus T.",
@@ -20,7 +20,7 @@ const testimonials = [
       "It handled Stripe billing, auth, and a full dashboard. Saved me at least two weeks of boilerplate work.",
     rating: 5,
     avatar: "MT",
-    gradient: "from-violet-500 to-fuchsia-600",
+    gradient: "from-teal-500 to-cyan-500",
   },
   {
     name: "Priya N.",
@@ -29,7 +29,7 @@ const testimonials = [
       "The real-time build log is genuinely addicting to watch. Feels like having a senior engineer pair-programming with you.",
     rating: 5,
     avatar: "PN",
-    gradient: "from-emerald-500 to-cyan-600",
+    gradient: "from-cyan-500 to-emerald-500",
   },
 ];
 
@@ -45,7 +45,7 @@ export function LandingTestimonials() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="text-sm font-medium text-violet-400 tracking-widest uppercase mb-4 block">
+          <span className="text-sm font-medium text-emerald-400 tracking-widest uppercase mb-4 block">
             Testimonials
           </span>
           <h2 className="text-4xl md:text-5xl font-bold text-[#F8FAFC] mb-5">
