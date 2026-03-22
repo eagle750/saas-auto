@@ -18,10 +18,23 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ai-auto-saas.dev";
+function safeMetadataBase(): URL {
+  const raw = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (raw) {
+    try {
+      return new URL(raw);
+    } catch {
+      /* fall through */
+    }
+  }
+  return new URL("https://ai-auto-saas.dev");
+}
+
+const metadataBaseUrl = safeMetadataBase();
+const siteUrl = metadataBaseUrl.origin;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(baseUrl),
+  metadataBase: metadataBaseUrl,
   title: {
     default: "AI-Auto-SaaS — Build SaaS with AI",
     template: "%s | AI-Auto-SaaS",
@@ -39,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: baseUrl,
+    url: siteUrl,
     siteName: "AI-Auto-SaaS",
     title: "AI-Auto-SaaS — Build SaaS with AI",
     description:
@@ -55,7 +68,7 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   robots: { index: true, follow: true },
-  alternates: { canonical: baseUrl },
+  alternates: { canonical: siteUrl },
 };
 
 export default function RootLayout({

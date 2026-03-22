@@ -15,11 +15,20 @@ function createDummyProxy(): PrismaClient {
 }
 
 function createPrismaClient(): PrismaClient {
-  // During build phase, don't instantiate PrismaClient
-  if (process.env.NEXT_PHASE === "phase-production-build" || !process.env.DATABASE_URL) {
+  const dbUrl = process.env.DATABASE_URL?.trim();
+
+  // `next build` without a DB URL (rare CI): avoid instantiating Neon during SSG analysis.
+  if (!dbUrl && process.env.NEXT_PHASE === "phase-production-build") {
     return createDummyProxy();
   }
-  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
+
+  if (!dbUrl) {
+    throw new Error(
+      "DATABASE_URL is not set for this runtime. In Vercel: Project → Settings → Environment Variables — enable DATABASE_URL for Production (and Preview), then redeploy."
+    );
+  }
+
+  const adapter = new PrismaNeon({ connectionString: dbUrl });
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
