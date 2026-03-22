@@ -13,6 +13,8 @@ const credentialsSchema = z.object({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   adapter: PrismaAdapter(prisma),
   providers: [
     ...(process.env.GITHUB_CLIENT_ID
@@ -45,7 +47,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   session: { strategy: "jwt" },
-  pages: { signIn: "/login", newUser: "/dashboard" },
+  pages: { signIn: "/login", newUser: "/dashboard", error: "/login" },
   callbacks: {
     async jwt({ token, user }) {
       if (user) token.id = user.id;
