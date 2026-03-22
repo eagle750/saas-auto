@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getRedis } from "@/lib/redis";
 
 export async function GET(
   req: Request,
@@ -64,6 +63,7 @@ export async function GET(
         console.error(`[SSE /api/projects/${id}/logs] Failed to fetch existing logs:`, err);
       }
 
+      const { getRedis } = await import("@/lib/redis");
       // Create a duplicate Redis connection for pub/sub
       const subscriber = getRedis().duplicate();
 

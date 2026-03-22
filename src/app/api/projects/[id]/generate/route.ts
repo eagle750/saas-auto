@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { addGenerationJob } from "@/lib/generation-queue";
 
 export async function POST(
   _req: Request,
@@ -81,7 +80,8 @@ export async function POST(
       data: { status: "QUEUED", errorLog: null },
     });
 
-    // Add job to generation queue
+    // Dynamic import: keeps bullmq off the module graph during `next build`
+    const { addGenerationJob } = await import("@/lib/generation-queue");
     await addGenerationJob(id);
 
     // Increment generationsUsed on subscription

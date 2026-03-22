@@ -1,6 +1,9 @@
-import { Queue } from "bullmq";
-
 export const QUEUE_NAME = "generation";
+
+/** Next sets this while running `next build` (including on Vercel). */
+function isNextProductionBuild(): boolean {
+  return process.env.NEXT_PHASE === "phase-production-build";
+}
 
 /**
  * Parse a Redis URL string into the individual ioredis connection options
@@ -54,11 +57,17 @@ export function buildBullmqRedisConnection() {
   };
 }
 
-let generationQueue: Queue<{ projectId: string }> | undefined;
+type GenJob = { projectId: string };
 
-function getGenerationQueue(): Queue<{ projectId: string }> {
+let generationQueue: import("bullmq").Queue<GenJob> | undefined;
+
+async function getGenerationQueue(): Promise<import("bullmq").Queue<GenJob>> {
+  if (isNextProductionBuild()) {
+    throw new Error("[generation-queue] Queue must not be used during next build");
+  }
   if (!generationQueue) {
-    generationQueue = new Queue<{ projectId: string }>(QUEUE_NAME, {
+    const { Queue } = await import("bullmq");
+    generationQueue = new Queue<GenJob>(QUEUE_NAME, {
       connection: buildBullmqRedisConnection(),
       skipMetasUpdate: true,
       defaultJobOptions: {
@@ -76,7 +85,11 @@ function getGenerationQueue(): Queue<{ projectId: string }> {
 }
 
 export async function addGenerationJob(projectId: string): Promise<void> {
-  await getGenerationQueue().add(
+  if (isNextProductionBuild()) {
+    return;
+  }
+  const q = await getGenerationQueue();
+  await q.add(
     `generate:${projectId}`,
     { projectId },
     {
