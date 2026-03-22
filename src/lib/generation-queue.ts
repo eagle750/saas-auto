@@ -1,0 +1,71 @@
+import { Queue } from "bullmq";
+
+export const QUEUE_NAME = "generation";
+
+/**
+ * Parse a Redis URL string into the individual ioredis connection options
+ * that BullMQ expects (host, port, password, db, tls).
+ */
+export function parseRedisUrl(url: string): {
+  host: string;
+  port: number;
+  password?: string;
+  db?: number;
+  tls?: object;
+  username?: string;
+} {
+  try {
+    const parsed = new URL(url);
+    const tls =
+      parsed.protocol === "rediss:" ? { rejectUnauthorized: false } : undefined;
+
+    return {
+      host: parsed.hostname || "127.0.0.1",
+      port: parsed.port ? parseInt(parsed.port, 10) : 6379,
+      ...(parsed.password ? { password: decodeURIComponent(parsed.password) } : {}),
+      ...(parsed.username ? { username: decodeURIComponent(parsed.username) } : {}),
+      ...(parsed.pathname && parsed.pathname.length > 1
+        ? { db: parseInt(parsed.pathname.slice(1), 10) }
+        : {}),
+      ...(tls ? { tls } : {}),
+    };
+  } catch {
+    return { host: "127.0.0.1", port: 6379 };
+  }
+}
+
+export function buildBullmqRedisConnection() {
+  const url = process.env.REDIS_URL ?? "redis://localhost:6379";
+  return {
+    lazyConnect: true,
+    maxRetriesPerRequest: null as null,
+    enableReadyCheck: false,
+    ...(process.env.REDIS_URL
+      ? { path: undefined, host: undefined, port: undefined }
+      : {}),
+    ...parseRedisUrl(url),
+  };
+}
+
+export const generationQueue = new Queue<{ projectId: string }>(QUEUE_NAME, {
+  connection: buildBullmqRedisConnection(),
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: {
+      type: "exponential",
+      delay: 5000,
+    },
+    removeOnComplete: 100,
+    removeOnFail: 200,
+  },
+});
+
+export async function addGenerationJob(projectId: string): Promise<void> {
+  await generationQueue.add(
+    `generate:${projectId}`,
+    { projectId },
+    {
+      jobId: `generate:${projectId}:${Date.now()}`,
+    }
+  );
+}

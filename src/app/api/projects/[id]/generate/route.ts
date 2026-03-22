@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { addGenerationJob } from "@/workers/generation.worker";
+import { addGenerationJob } from "@/lib/generation-queue";
 
 export async function POST(
   _req: Request,
