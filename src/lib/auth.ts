@@ -49,6 +49,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   pages: { signIn: "/login", newUser: "/dashboard", error: "/login" },
   callbacks: {
+    async signIn({ user, account }) {
+      // Always allow credentials sign-in (handled by authorize)
+      if (account?.provider === "credentials") return true;
+      // Allow OAuth sign-in if we have a valid user
+      if (!user?.email) return false;
+      return true;
+    },
     async redirect({ url, baseUrl }) {
       // Allow relative URLs
       if (url.startsWith("/")) return `${baseUrl}${url}`;
