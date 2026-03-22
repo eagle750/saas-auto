@@ -1,9 +1,14 @@
+import { neonConfig } from "@neondatabase/serverless";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "@prisma/client";
-import { PrismaNeonHttp } from "@prisma/adapter-neon";
+import ws from "ws";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
+
+// Neon serverless driver needs a WebSocket implementation on Node (Vercel included).
+neonConfig.webSocketConstructor = ws as unknown as typeof WebSocket;
 
 function createDummyProxy(): PrismaClient {
   return new Proxy({} as PrismaClient, {
@@ -28,12 +33,9 @@ function createPrismaClient(): PrismaClient {
     );
   }
 
-  // HTTP driver (no WebSockets). The default PrismaNeon WS pool often breaks on Vercel
-  // unless `ws` + neonConfig.webSocketConstructor are wired; HTTP is simpler for serverless.
-  const adapter = new PrismaNeonHttp(dbUrl, {
-    arrayMode: false,
-    fullResults: false,
-  });
+  // Use WebSocket pool (PrismaNeon), not PrismaNeonHttp: HTTP mode does not support
+  // Prisma transactions, so writes like `project.create` fail with 500 while reads work.
+  const adapter = new PrismaNeon({ connectionString: dbUrl });
 
   return new PrismaClient({
     adapter,
