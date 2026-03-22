@@ -64,9 +64,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
+    <html lang="en" suppressHydrationWarning className={`dark ${inter.variable} ${jetbrainsMono.variable}`}>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} min-h-screen flex flex-col antialiased bg-[#0A0F1C] text-[#F8FAFC]`}
+        className="min-h-screen flex flex-col antialiased bg-[#0A0F1C] text-[#F8FAFC]"
       >
         <SessionProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
