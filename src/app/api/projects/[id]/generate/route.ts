@@ -74,15 +74,11 @@ export async function POST(
       );
     }
 
-    // Update project status to QUEUED
+    // Update project status to QUEUED (worker polls Postgres — no Redis/BullMQ)
     await prisma.project.update({
       where: { id },
       data: { status: "QUEUED", errorLog: null },
     });
-
-    // Dynamic import: keeps bullmq off the module graph during `next build`
-    const { addGenerationJob } = await import("@/lib/generation-queue");
-    await addGenerationJob(id);
 
     // Increment generationsUsed on subscription
     await prisma.subscription.update({
@@ -107,7 +103,7 @@ export async function POST(
     }
 
     return NextResponse.json(
-      { error: "Failed to queue generation job", code: "INTERNAL_ERROR" },
+      { error: "Failed to queue generation", code: "INTERNAL_ERROR" },
       { status: 500 }
     );
   }

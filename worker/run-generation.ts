@@ -1,66 +1,62 @@
 /**
- * BullMQ worker process — lives outside `src/` so Next.js never loads this file
- * during `next build` (which was causing Redis ECONNREFUSED on Vercel).
- *
- * Run: npm run worker
+ * Long-running worker: claims `QUEUED` projects from Postgres and runs the pipeline.
+ * No Redis/BullMQ — run alongside the app: `npm run worker`
  */
-import { Worker, type Job } from "bullmq";
 import { runGenerationPipeline } from "../src/ai/orchestrator";
-import {
-  QUEUE_NAME,
-  buildBullmqRedisConnection,
-} from "../src/lib/generation-queue";
 import { prisma } from "../src/lib/prisma";
 
-const generationWorker = new Worker<{ projectId: string }>(
-  QUEUE_NAME,
-  async (job: Job<{ projectId: string }>) => {
-    const { projectId } = job.data;
+const POLL_MS_WHEN_IDLE = 2000;
 
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
+async function claimNextQueuedProject() {
+  const candidates = await prisma.project.findMany({
+    where: { status: "QUEUED" },
+    orderBy: { updatedAt: "asc" },
+    take: 8,
+  });
+
+  for (const c of candidates) {
+    const locked = await prisma.project.updateMany({
+      where: { id: c.id, status: "QUEUED" },
+      data: { status: "PLANNING" },
     });
-
-    if (!project) {
-      throw new Error(`Project not found: ${projectId}`);
+    if (locked.count === 1) {
+      return prisma.project.findUnique({ where: { id: c.id } });
     }
-
-    await runGenerationPipeline(project);
-  },
-  {
-    connection: buildBullmqRedisConnection(),
-    concurrency: 2,
   }
-);
+  return null;
+}
 
-generationWorker.on("failed", async (job, err) => {
-  if (!job) return;
+async function runLoop() {
+  for (;;) {
+    try {
+      const project = await claimNextQueuedProject();
+      if (!project) {
+        await new Promise((r) => setTimeout(r, POLL_MS_WHEN_IDLE));
+        continue;
+      }
 
-  const { projectId } = job.data;
-  console.error(`[generation.worker] Job ${job.id} failed for project ${projectId}:`, err);
-
-  try {
-    await prisma.project.update({
-      where: { id: projectId },
-      data: {
-        status: "FAILED",
-        errorLog: err instanceof Error ? err.message : String(err),
-      },
-    });
-  } catch (updateErr) {
-    console.error(
-      `[generation.worker] Failed to mark project ${projectId} as FAILED:`,
-      updateErr
-    );
+      try {
+        await runGenerationPipeline(project);
+        console.log(`[worker] Completed project ${project.id}`);
+      } catch (err) {
+        console.error(`[worker] Pipeline failed for ${project.id}:`, err);
+        try {
+          await prisma.project.update({
+            where: { id: project.id },
+            data: {
+              status: "FAILED",
+              errorLog: err instanceof Error ? err.message : String(err),
+            },
+          });
+        } catch (updateErr) {
+          console.error(`[worker] Failed to mark FAILED:`, updateErr);
+        }
+      }
+    } catch (err) {
+      console.error("[worker] Loop error:", err);
+      await new Promise((r) => setTimeout(r, POLL_MS_WHEN_IDLE));
+    }
   }
-});
+}
 
-generationWorker.on("completed", (job) => {
-  console.log(
-    `[generation.worker] Job ${job.id} completed for project ${job.data.projectId}`
-  );
-});
-
-generationWorker.on("error", (err) => {
-  console.error("[generation.worker] Worker error:", err);
-});
+void runLoop();

@@ -32,22 +32,14 @@ else
   echo "⚠️  DATABASE_URL not set. Skipping migrations."
 fi
 
-# Check Redis
-echo "🔴 Checking Redis connection..."
-if command -v redis-cli >/dev/null 2>&1; then
-  redis-cli ping > /dev/null 2>&1 && echo "✅ Redis is running" || echo "⚠️  Redis is not running. Start with: redis-server"
-else
-  echo "⚠️  redis-cli not found. Install Redis: https://redis.io/docs/getting-started/"
-fi
-
 echo ""
 echo "✅ Setup complete!"
 echo ""
 echo "Next steps:"
 echo "  1. Fill in .env.local with your credentials"
-echo "  2. Start Redis: redis-server"
-echo "  3. Run database migrations: npx prisma migrate dev"
-echo "  4. Start the dev server: npm run dev"
+echo "  2. Run database migrations: npx prisma migrate dev"
+echo "  3. Start the dev server: npm run dev"
+echo "  4. In another terminal, run the generation worker: npm run worker"
 echo "  5. Open http://localhost:3000"
 echo ""
 echo "📚 See README.md for detailed setup instructions."

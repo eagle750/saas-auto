@@ -1,12 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { publishBuildLog } from "@/lib/redis";
 import { pushToGitHub } from "@/lib/github";
 import { decrypt } from "@/lib/crypto";
 import { planArchitecture, topologicalSort } from "./planner";
 import { generateFile, selectModel } from "./generator";
 import { reviewCode } from "./reviewer";
 import { validateAllFiles } from "./utils/codeValidator";
-import type { Project, BuildLog, GenerationConfig, ArchitecturePlan } from "@/types/project";
+import type { BuildLog, GenerationConfig, ArchitecturePlan } from "@/types/project";
 import type { Prisma } from "@prisma/client";
 
 type PrismaProject = Prisma.ProjectGetPayload<object>;
@@ -47,9 +46,7 @@ async function emitLog(
   level: BuildLog["level"] = "INFO"
 ): Promise<void> {
   const timestamp = new Date().toISOString();
-  const logData = { step, message, level, timestamp };
 
-  // Save to DB
   await prisma.buildLog.create({
     data: {
       projectId,
@@ -58,12 +55,6 @@ async function emitLog(
       level,
       metadata: { timestamp } as Prisma.InputJsonValue,
     },
-  });
-
-  // Publish to Redis for SSE streaming
-  await publishBuildLog(projectId, logData).catch(() => {
-    // Redis publish failure is non-fatal
-    console.warn(`Failed to publish build log for project ${projectId}`);
   });
 }
 
