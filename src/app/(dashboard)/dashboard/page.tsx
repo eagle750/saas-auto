@@ -18,21 +18,28 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const [projects, subscription] = await Promise.all([
-    prisma.project.findMany({
-      where: { userId: session.user.id },
-      orderBy: { createdAt: "desc" },
-      include: {
-        buildLogs: {
-          orderBy: { createdAt: "desc" },
-          take: 1,
+  let projects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
+  let subscription: Awaited<ReturnType<typeof prisma.subscription.findUnique>> = null;
+
+  try {
+    [projects, subscription] = await Promise.all([
+      prisma.project.findMany({
+        where: { userId: session.user.id },
+        orderBy: { createdAt: "desc" },
+        include: {
+          buildLogs: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          },
         },
-      },
-    }),
-    prisma.subscription.findUnique({
-      where: { userId: session.user.id },
-    }),
-  ]);
+      }),
+      prisma.subscription.findUnique({
+        where: { userId: session.user.id },
+      }),
+    ]);
+  } catch (e) {
+    console.error("Failed to fetch dashboard data:", e);
+  }
 
   const completed = projects.filter((p) => p.status === "COMPLETED").length;
   const inProgress = projects.filter(
