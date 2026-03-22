@@ -34,13 +34,20 @@ export function parseRedisUrl(url: string): {
   }
 }
 
+/** Trimmed non-empty URL, or undefined (empty env var must not bypass ?? and hit localhost). */
+export function resolvedRedisUrl(): string {
+  const raw = process.env.REDIS_URL?.trim();
+  return raw || "redis://localhost:6379";
+}
+
 export function buildBullmqRedisConnection() {
-  const url = process.env.REDIS_URL ?? "redis://localhost:6379";
+  const raw = process.env.REDIS_URL?.trim();
+  const url = resolvedRedisUrl();
   return {
     lazyConnect: true,
     maxRetriesPerRequest: null as null,
     enableReadyCheck: false,
-    ...(process.env.REDIS_URL
+    ...(raw
       ? { path: undefined, host: undefined, port: undefined }
       : {}),
     ...parseRedisUrl(url),
@@ -53,6 +60,7 @@ function getGenerationQueue(): Queue<{ projectId: string }> {
   if (!generationQueue) {
     generationQueue = new Queue<{ projectId: string }>(QUEUE_NAME, {
       connection: buildBullmqRedisConnection(),
+      skipMetasUpdate: true,
       defaultJobOptions: {
         attempts: 3,
         backoff: {

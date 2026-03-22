@@ -1,12 +1,18 @@
+/**
+ * BullMQ worker process — lives outside `src/` so Next.js never loads this file
+ * during `next build` (which was causing Redis ECONNREFUSED on Vercel).
+ *
+ * Run: npm run worker
+ */
 import { Worker, type Job } from "bullmq";
-import { runGenerationPipeline } from "@/ai/orchestrator";
+import { runGenerationPipeline } from "../src/ai/orchestrator";
 import {
   QUEUE_NAME,
   buildBullmqRedisConnection,
-} from "@/lib/generation-queue";
-import { prisma } from "@/lib/prisma";
+} from "../src/lib/generation-queue";
+import { prisma } from "../src/lib/prisma";
 
-export const generationWorker = new Worker<{ projectId: string }>(
+const generationWorker = new Worker<{ projectId: string }>(
   QUEUE_NAME,
   async (job: Job<{ projectId: string }>) => {
     const { projectId } = job.data;
