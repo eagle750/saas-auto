@@ -23,7 +23,19 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
-  const [authError, setAuthError] = useState<string | null>(null);
+  const oauthError = searchParams.get("error");
+  const oauthErrorMap: Record<string, string> = {
+    OAuthAccountNotLinked: "An account with this email already exists. Please sign in with your original method.",
+    OAuthCallbackError: "Something went wrong during sign-in. Please try again.",
+    OAuthSignin: "Could not start the sign-in flow. Please try again.",
+    OAuthCreateAccount: "Could not create your account. Please try again.",
+    Configuration: "OAuth provider is not configured. Please check that GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and AUTH_SECRET are set in your environment variables.",
+    Callback: "Something went wrong during sign-in. Please try again.",
+    Default: "An unexpected error occurred. Please try again.",
+  };
+  const [authError, setAuthError] = useState<string | null>(
+    oauthError ? (oauthErrorMap[oauthError] ?? oauthErrorMap.Default) : null
+  );
   const [oauthLoading, setOAuthLoading] = useState<"github" | "google" | null>(
     null
   );
