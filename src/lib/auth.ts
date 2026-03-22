@@ -15,7 +15,7 @@ const credentialsSchema = z.object({
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
-  adapter: PrismaAdapter(prisma),
+  ...(process.env.DATABASE_URL ? { adapter: PrismaAdapter(prisma) } : {}),
   providers: [
     ...(process.env.GITHUB_CLIENT_ID
       ? [GitHub({ clientId: process.env.GITHUB_CLIENT_ID, clientSecret: process.env.GITHUB_CLIENT_SECRET!, allowDangerousEmailAccountLinking: true })]
@@ -70,13 +70,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string;
-        const sub = await prisma.subscription.findUnique({ where: { userId: token.id as string } });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (session.user as any).plan = sub?.plan ?? "FREE";
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (session.user as any).generationsUsed = sub?.generationsUsed ?? 0;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (session.user as any).generationsLimit = sub?.generationsLimit ?? 2;
+        try {
+          const sub = await prisma.subscription.findUnique({ where: { userId: token.id as string } });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (session.user as any).plan = sub?.plan ?? "FREE";
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (session.user as any).generationsUsed = sub?.generationsUsed ?? 0;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (session.user as any).generationsLimit = sub?.generationsLimit ?? 2;
+        } catch (e) {
+          console.error("Failed to fetch subscription in session callback:", e);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (session.user as any).plan = "FREE";
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (session.user as any).generationsUsed = 0;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (session.user as any).generationsLimit = 2;
+        }
       }
       return session;
     },
