@@ -14,9 +14,9 @@ export function LandingHero() {
       <div className="absolute inset-0 grid-bg pointer-events-none" />
 
       {/* Animated orbs */}
-      <div className="absolute top-20 left-[10%] w-72 h-72 bg-blue-600/20 rounded-full blur-[120px] animate-float pointer-events-none" />
-      <div className="absolute bottom-20 right-[10%] w-96 h-96 bg-purple-600/15 rounded-full blur-[120px] animate-float pointer-events-none" style={{ animationDelay: "-3s" }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-fuchsia-600/8 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-20 left-[10%] w-72 h-72 bg-emerald-500/20 rounded-full blur-[120px] animate-float pointer-events-none" />
+      <div className="absolute bottom-20 right-[10%] w-96 h-96 bg-teal-500/15 rounded-full blur-[120px] animate-float pointer-events-none" style={{ animationDelay: "-3s" }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-cyan-500/8 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto text-center">
         <motion.div
@@ -28,7 +28,7 @@ export function LandingHero() {
             variant="secondary"
             className="mb-8 text-sm px-4 py-2 border border-white/10 bg-white/[0.04] backdrop-blur-sm hover:bg-white/[0.08] transition-colors cursor-default"
           >
-            <Sparkles className="h-3.5 w-3.5 mr-2 text-violet-400" />
+            <Sparkles className="h-3.5 w-3.5 mr-2 text-emerald-400" />
             Powered by Claude + Gemini AI
             <ArrowRight className="h-3.5 w-3.5 ml-2 text-slate-500" />
           </Badge>
@@ -75,7 +75,7 @@ export function LandingHero() {
           <Button
             size="lg"
             variant="outline"
-            className="text-base px-8 py-6 border-white/10 hover:bg-white/5 hover:border-white/20 text-[#F8FAFC] rounded-xl transition-all"
+            className="text-base px-8 py-6 border-white/10 hover:bg-white/5 hover:border-emerald-500/30 text-[#F8FAFC] rounded-xl transition-all"
             asChild
           >
             <Link href="#pricing">

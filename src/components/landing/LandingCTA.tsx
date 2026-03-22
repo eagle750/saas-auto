@@ -10,7 +10,7 @@ export function LandingCTA() {
     <section className="py-24 relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 mesh-gradient pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative max-w-3xl mx-auto px-6 text-center">
         <motion.div

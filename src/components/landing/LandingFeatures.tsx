@@ -8,40 +8,40 @@ const features = [
     icon: Zap,
     title: "AI-Powered Generation",
     desc: "Claude + Gemini collaboratively plan and write your entire codebase with production-quality code.",
-    color: "text-blue-400",
-    glowColor: "group-hover:shadow-blue-500/20",
-    borderColor: "group-hover:border-blue-500/30",
-    iconBg: "bg-blue-500/10",
-    span: "md:col-span-2", // wide card
+    color: "text-emerald-400",
+    glowColor: "group-hover:shadow-emerald-500/20",
+    borderColor: "group-hover:border-emerald-500/30",
+    iconBg: "bg-emerald-500/10",
+    span: "md:col-span-2",
   },
   {
     icon: Github,
     title: "GitHub Push",
     desc: "Generated code lands directly in your GitHub repository in a single commit, ready to deploy.",
-    color: "text-purple-400",
-    glowColor: "group-hover:shadow-purple-500/20",
-    borderColor: "group-hover:border-purple-500/30",
-    iconBg: "bg-purple-500/10",
+    color: "text-teal-400",
+    glowColor: "group-hover:shadow-teal-500/20",
+    borderColor: "group-hover:border-teal-500/30",
+    iconBg: "bg-teal-500/10",
     span: "md:col-span-1",
   },
   {
     icon: Activity,
     title: "Real-Time Progress",
     desc: "Watch your project build in real-time with a live streaming build log — file by file.",
-    color: "text-emerald-400",
-    glowColor: "group-hover:shadow-emerald-500/20",
-    borderColor: "group-hover:border-emerald-500/30",
-    iconBg: "bg-emerald-500/10",
+    color: "text-cyan-400",
+    glowColor: "group-hover:shadow-cyan-500/20",
+    borderColor: "group-hover:border-cyan-500/30",
+    iconBg: "bg-cyan-500/10",
     span: "md:col-span-1",
   },
   {
     icon: Layers,
     title: "Multi-Tier Projects",
     desc: "From simple landing pages to full-stack SaaS with auth, payments, databases, and admin panels.",
-    color: "text-indigo-400",
-    glowColor: "group-hover:shadow-indigo-500/20",
-    borderColor: "group-hover:border-indigo-500/30",
-    iconBg: "bg-indigo-500/10",
+    color: "text-teal-400",
+    glowColor: "group-hover:shadow-teal-500/20",
+    borderColor: "group-hover:border-teal-500/30",
+    iconBg: "bg-teal-500/10",
     span: "md:col-span-2",
   },
   {
@@ -58,10 +58,10 @@ const features = [
     icon: Globe,
     title: "Deploy Anywhere",
     desc: "Get tailored deployment guides for Vercel, Railway, Render, Netlify, or Docker.",
-    color: "text-cyan-400",
-    glowColor: "group-hover:shadow-cyan-500/20",
-    borderColor: "group-hover:border-cyan-500/30",
-    iconBg: "bg-cyan-500/10",
+    color: "text-emerald-400",
+    glowColor: "group-hover:shadow-emerald-500/20",
+    borderColor: "group-hover:border-emerald-500/30",
+    iconBg: "bg-emerald-500/10",
     span: "md:col-span-1",
   },
 ];
@@ -78,7 +78,7 @@ export function LandingFeatures() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="text-sm font-medium text-violet-400 tracking-widest uppercase mb-4 block">
+          <span className="text-sm font-medium text-emerald-400 tracking-widest uppercase mb-4 block">
             Features
           </span>
           <h2 className="text-4xl md:text-5xl font-bold text-[#F8FAFC] mb-5">
