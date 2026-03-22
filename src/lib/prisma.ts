@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaNeonHttp } from "@prisma/adapter-neon";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -17,7 +17,7 @@ function createDummyProxy(): PrismaClient {
 function createPrismaClient(): PrismaClient {
   const dbUrl = process.env.DATABASE_URL?.trim();
 
-  // `next build` without a DB URL (rare CI): avoid instantiating Neon during SSG analysis.
+  // `next build` without a DB URL (rare CI): avoid touching Neon during SSG analysis.
   if (!dbUrl && process.env.NEXT_PHASE === "phase-production-build") {
     return createDummyProxy();
   }
@@ -28,7 +28,13 @@ function createPrismaClient(): PrismaClient {
     );
   }
 
-  const adapter = new PrismaNeon({ connectionString: dbUrl });
+  // HTTP driver (no WebSockets). The default PrismaNeon WS pool often breaks on Vercel
+  // unless `ws` + neonConfig.webSocketConstructor are wired; HTTP is simpler for serverless.
+  const adapter = new PrismaNeonHttp(dbUrl, {
+    arrayMode: false,
+    fullResults: false,
+  });
+
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
