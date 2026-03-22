@@ -17,10 +17,12 @@ function createRedisClient(): Redis {
   return client;
 }
 
-export const redis = globalForRedis.redis ?? createRedisClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForRedis.redis = redis;
+/** Lazily create Redis so Next.js build (loading API route modules) never opens a socket. */
+export function getRedis(): Redis {
+  if (!globalForRedis.redis) {
+    globalForRedis.redis = createRedisClient();
+  }
+  return globalForRedis.redis;
 }
 
 /**
@@ -30,5 +32,5 @@ export async function publishBuildLog(
   projectId: string,
   data: { step: string; message: string; level: string; timestamp: string }
 ): Promise<void> {
-  await redis.publish(`build:${projectId}`, JSON.stringify(data));
+  await getRedis().publish(`build:${projectId}`, JSON.stringify(data));
 }

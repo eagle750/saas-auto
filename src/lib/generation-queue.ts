@@ -47,21 +47,28 @@ export function buildBullmqRedisConnection() {
   };
 }
 
-export const generationQueue = new Queue<{ projectId: string }>(QUEUE_NAME, {
-  connection: buildBullmqRedisConnection(),
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: {
-      type: "exponential",
-      delay: 5000,
-    },
-    removeOnComplete: 100,
-    removeOnFail: 200,
-  },
-});
+let generationQueue: Queue<{ projectId: string }> | undefined;
+
+function getGenerationQueue(): Queue<{ projectId: string }> {
+  if (!generationQueue) {
+    generationQueue = new Queue<{ projectId: string }>(QUEUE_NAME, {
+      connection: buildBullmqRedisConnection(),
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: "exponential",
+          delay: 5000,
+        },
+        removeOnComplete: 100,
+        removeOnFail: 200,
+      },
+    });
+  }
+  return generationQueue;
+}
 
 export async function addGenerationJob(projectId: string): Promise<void> {
-  await generationQueue.add(
+  await getGenerationQueue().add(
     `generate:${projectId}`,
     { projectId },
     {

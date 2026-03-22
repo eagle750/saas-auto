@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { redis } from "@/lib/redis";
+import { getRedis } from "@/lib/redis";
 
 export async function GET(
   req: Request,
@@ -65,7 +65,7 @@ export async function GET(
       }
 
       // Create a duplicate Redis connection for pub/sub
-      const subscriber = redis.duplicate();
+      const subscriber = getRedis().duplicate();
 
       const cleanup = async () => {
         try {
