@@ -19,28 +19,40 @@ export default function HomePage() {
       {/* Hero */}
       <LandingHero />
 
-      {/* 3-Step Process: Describe → Configure → Deploy */}
-      <LandingProcess />
+      {/* 3-Step Process */}
+      <div className="border-t border-white/[0.04]">
+        <LandingProcess />
+      </div>
 
-      {/* Features Grid (6 cards) */}
-      <LandingFeatures />
+      {/* Features Bento Grid */}
+      <div className="border-t border-white/[0.04]">
+        <LandingFeatures />
+      </div>
 
       {/* Testimonials */}
-      <LandingTestimonials />
+      <div className="border-t border-white/[0.04]">
+        <LandingTestimonials />
+      </div>
 
       {/* Pricing */}
       <section
         id="pricing"
-        className="py-24 px-6 w-full"
+        className="py-24 px-6 w-full border-t border-white/[0.04] relative"
         aria-labelledby="pricing-heading"
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="absolute inset-0 grid-bg pointer-events-none" />
+
+        <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-16">
+            <span className="text-sm font-medium text-violet-400 tracking-widest uppercase mb-4 block">
+              Pricing
+            </span>
             <h2
               id="pricing-heading"
-              className="text-4xl font-bold text-[#F8FAFC] mb-4"
+              className="text-4xl md:text-5xl font-bold text-[#F8FAFC] mb-5"
             >
-              Simple, transparent pricing
+              Simple, transparent{" "}
+              <span className="gradient-text">pricing</span>
             </h2>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
               Start free, scale as you grow. No hidden fees, no surprises.
@@ -52,7 +64,7 @@ export default function HomePage() {
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="h-96 bg-white/5 rounded-2xl border border-white/10"
+                    className="h-96 bg-white/[0.03] rounded-2xl border border-white/[0.06]"
                   />
                 ))}
               </div>
@@ -64,7 +76,9 @@ export default function HomePage() {
       </section>
 
       {/* CTA Banner */}
-      <LandingCTA />
+      <div className="border-t border-white/[0.04]">
+        <LandingCTA />
+      </div>
     </div>
   );
 }
